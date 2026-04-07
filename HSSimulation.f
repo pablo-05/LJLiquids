@@ -55,7 +55,7 @@
       Nmeas = 0
       t = 1
       do k=1, STEPS    ! We are going to perform STEPS MC steps
-        print*,k
+        !print*,k
         do j=1, Np     ! For each MC step, iterate over every particle
           call random_number(ran) ! We do a random particle selection
           m = int(ran * Np) + 1 ! int() produces from 0 to Np-1, thus +1
