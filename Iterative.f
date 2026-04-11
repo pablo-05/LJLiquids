@@ -4,7 +4,7 @@
       INTEGER i,j,k,N
       PARAMETER (rmax=8.d0, alpha=0.1d0)
       PARAMETER (pi=4.d0*datan(1.d0), N=2**11, step=rmax/N)
-      real fo(N), fn(N), c(N), h(N)
+      real*8 fo(N), fn(N), c(N), h(N)
       print *, "the maximum valid k_r (in spherical coordinates) is "
      &, pi/step
       do i=1, N
