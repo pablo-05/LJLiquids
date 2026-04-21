@@ -15,18 +15,22 @@
       do while(error.gt.limit)
         error=0
         do i=1, N
+          !calculamos rh(r) en el espacio de momentos
           h(i)=step*i*((fo(i)+1)*
      &exp(-4*betae*((1/(i*step)**12)-(1/(i*step)**6)))-1)
+          !calculamos rc(r) en el espacio de momentos
           c(i)=h(i)-step*i*fo(i)
         end do
         call sinft(h,N)
         call sinft(c,N)
         do i= 1, N
-          fn(i) = rho * h(i) * c(i) * 16 * pi / i * rmax
+        !calculamos qfnew(q)=(4pi)**2 (dr)**2 sinft(rh)sinft(rc)/q con q=pi i/rmax
+          fn(i) = rho * h(i) * c(i) * 16 * pi *step**2 / i * rmax
         end do
         call sinft(fn,N)
         do i=1, N
-        fn(i) = fn(i)/ (2.0 * N * pi * i)
+        !obtenemos f(r)=2/N * dq/(r *2pi**2) sinft(qfnew(q)) con dq=pi/rmax y r = i*step
+        fn(i) = fn(i) / (N * pi * i * step * rmax)
         end do
         fn= alpha * fn + (1-alpha) * fo
         do i =1, N
