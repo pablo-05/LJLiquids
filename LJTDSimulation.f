@@ -10,8 +10,8 @@
       LOGICAL nAccepted
       
       ! Parameters setup
-      ! For density rho = 0.75, L = (Np/0.75)^(1/3). With Np=343, L ~ 7.7046d0
-      PARAMETER (L=7.7046d0, Np=343, STEPS=50000, deltamax=0.2d0)
+      ! For density rho = 0.40, L = (Np/0.40)^(1/3). With Np=343, L ~ 9.4996d0
+      PARAMETER (L=9.4996d0, Np=343, STEPS=50000, deltamax=0.2d0)
       PARAMETER (pi=4*datan(1.d0), rbin=0.1d0)
       PARAMETER (Nbins=int((L/2.d0)/rbin))
       
@@ -29,8 +29,7 @@
       ! ============================================
       ! This ensures particles start without overlaps. We are
       ! initializing to a simple cubic lattice with equal separation
-      ! Using +0.999d0 ensures 343^(1/3) doesn't truncate to 6 due to FP math
-      initCubeSide = int(dble(Np)**(1.d0/3.d0) + 0.999d0) ! Max cube side needed
+      initCubeSide = int(dble(Np)**(1.d0/3.d0)+0.999) ! Max cube side needed
       m = 1
       do i=0, initCubeSide - 1
         do j=0, initCubeSide - 1
@@ -57,7 +56,9 @@
       Nmeas = 0
       t = 1
       do k=1, STEPS    ! We are going to perform STEPS MC steps
-        call PROGRESS_BAR(k, STEPS)
+        if (mod(k, max(1, STEPS/100)) .eq. 0 .or. k .eq. STEPS) then
+          call PROGRESS_BAR(k, STEPS)
+        end if
         do j=1, Np     ! For each MC step, iterate over every particle
           call random_number(ran) ! We do a random particle selection
           m = int(ran * Np) + 1 ! int() produces from 0 to Np-1, thus +1
@@ -75,7 +76,7 @@
             if (rnew(i) .lt. 0.d0) rnew(i) = rnew(i) + L
           end do
           
-          ! Subroutine to check for overlapping
+          ! Subroutine to calculate energy change and accept/reject move
           call ENERGY(Np, m, r, rnew, L, nAccepted)
           if (nAccepted) then
             r(m,1:3) = rnew(1:3)
@@ -128,7 +129,7 @@
 
       END PROGRAM
 
-      ! Subroutine: Check for Hard Sphere overlaps
+      ! Subroutine: Calculate energy change and apply Metropolis criterion
       SUBROUTINE ENERGY(Np, m, r, rnew, L, nAccepted)
       IMPLICIT NONE
       INTEGER m, Np, i
@@ -141,8 +142,8 @@
       newE = 0.d0
       oldE = 0.d0
       
-      ! We are at T=0.95, so beta=1/T
-      beta = 1.d0 / 1.15d0
+      ! We are at T=1.25, so beta=1/T
+      beta = 1.d0 / 1.25d0
       
       do i=1, Np ! We check against every other particle
         if (i .ne. m) then ! except ourselves
@@ -157,7 +158,7 @@
       end do
 
       ! We accept the move if the energy is lower, or with a Boltzmann
-      ! probability if it is higher. We are at T=1, so kT=1.
+      ! probability if it is higher. We are at T=1.25, so kT=1.25.
       if (newE .gt. oldE) then
         CALL RANDOM_NUMBER(RAN)
         if (EXP(-beta*(newE-oldE)) .lt. RAN) then
@@ -189,9 +190,18 @@
 
       REAL*8 FUNCTION POTENTIAL(dist)
       IMPLICIT NONE
-      REAL*8 dist
-
-      POTENTIAL = 4.d0 * (1.d0/(dist**12) - 1.d0/(dist**6))
+      REAL*8 dist, rc, vc
+      
+      rc = 2.5d0
+      
+      if (dist .lt. 0.3d0) then
+        POTENTIAL = 1.d30 ! Hard-core repulsion, effectively infinite
+      else if (dist .lt. rc) then
+        vc = 4.d0 * (1.d0/(rc**12) - 1.d0/(rc**6))
+        POTENTIAL = 4.d0 * (1.d0/(dist**12) - 1.d0/(dist**6)) - vc
+      else
+        POTENTIAL = 0.d0
+      end if
 
       END FUNCTION
 
