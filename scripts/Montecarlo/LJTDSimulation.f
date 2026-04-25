@@ -13,7 +13,7 @@
       ! For density rho = 0.40, L = (Np/0.40)^(1/3). With Np=343, L ~ 9.4996d0
       PARAMETER (L=9.4996d0, Np=343, STEPS=50000, deltamax=0.2d0)
       PARAMETER (pi=4*datan(1.d0), rbin=0.1d0)
-      PARAMETER (Nbins=int((L/2.d0)/rbin))
+      PARAMETER (Nbins=int(4.1d0/rbin))
       
       ! Arrays
       REAL*8 r(Np, 3), rnew(3), bins(0:Nbins-1) ! Positions of every part.,
@@ -94,7 +94,7 @@
             do m = n + 1, Np
               CALL DISTANCE(r(n,1), r(n,2), r(n,3), r(m,1), r(m,2),
      +                      r(m,3), L, dist)
-              if (dist .lt. L/2.d0) then
+              if (dist .lt. 4.1d0) then
                 i = int(dist / rbin)
                 bins(i) = bins(i) + 2.d0
               end if
