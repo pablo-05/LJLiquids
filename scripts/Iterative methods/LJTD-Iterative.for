@@ -49,14 +49,13 @@
           fnew(i) = fnew(i) / (2.0 * pi * i * step * rmax)
         end do
 
-        do i=1, N
-          fnew(i) = alpha * fnew(i) + (1-alpha) * fold(i)
-        end do
-
-
-        ! Calculate the total divergence
+        ! Calculate the total divergence (before mixing to avoid artificial limit bypassing)
         do i=1, N
           error = error + abs(fnew(i)-fold(i))
+        end do
+
+        do i=1, N
+          fnew(i) = alpha * fnew(i) + (1.0-alpha) * fold(i)
         end do
 
         ! Set the arrays for a new iteration
@@ -71,7 +70,7 @@
       end do
 
       ! Save the results to memory
-      open(11, File="PYgofr.dat")
+      open(11, File="PY.dat")
       do i=1, N
         write(11, *) i*step, g(i)
       end do
@@ -86,7 +85,7 @@
       ! Get the last h(r) PY value
       do i=1, N
         ! Calculate r*h(r) — sinft needs r*f(r) for the 3D radial transform
-        h(i) = i*step * ((fold(i)+1)*exp(-beta*PHI(i*step)) - 1.0)
+        h(i) = 0.0 ! i*step * ((fold(i)+1)*exp(-beta*PHI(i*step)) - 1.0)
       end do
 
       ! MAIN LOOP of the iterative method
@@ -114,19 +113,19 @@
         ! We also perform on the spot the closure relation calculation
         do i=1, N
           c(i) = c(i) / (2.0 * pi * i * step * rmax)
-          h(i) = exp( -beta*PHI(i*step) + (fold(i)/i/step) - c(i) ) - 1
-        end do
-
-        ! Calculate the total divergence
-        do i=1, N
-          error = error + abs(h(i)-fold(i))
+          h(i) = exp( -beta*PHI(i*step) + (fold(i)/(i*step)) - c(i) )
+          h(i) = i*step * ( h(i) - 1.0 )
+          
+          error = error + abs(h(i)-fold(i)) ! Divergence before mixing
+          
+          h(i) = alpha * h(i) + (1.0-alpha) * fold(i)
         end do
       end do
 
       ! Save the results to memory
-      open(11, File="HNCgofr.dat")
+      open(11, File="HNC.dat")
       do i=1, N
-        write(11, *) i*step, h(i)+1
+        write(11, *) i*step, (h(i)/(i*step)) + 1.0
       end do
       close(11)
 

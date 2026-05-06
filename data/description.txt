@@ -1,7 +1,7 @@
 LENNARD JONES CUT AND SHIFTED POTENTIAL
 1 - rho = 0.05, T = 0.90: Stable gas
 2 - rho = 0.80, T = 0.90: Stable liquid
-3 - rho = 0.40, T = 0.80: Coexistence of gas and liquid
+3 - rho = 0.05, T = 1.25: -
 4 - rho = 0.34, T = 1.10: Near critical point
 5 - rho = 0.40, T = 1.25: Supercritical fluid
 LENNARD JONES FULL POTENTIAL
