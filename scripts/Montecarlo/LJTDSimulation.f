@@ -3,25 +3,28 @@
       
       ! Parameters and Variables
       REAL*8 L, ran, deltamax, pi, dist, rbin, rho, r_in, r_out
-      REAL*8 r_middle, V_shell, g_r
+      REAL*8 r_middle, V_shell, g_r, T_target, rho_target
       INTEGER Np, STEPS, Nmov, n, initCubeSide, Nbins, Nmeas
       INTEGER i, j, k, t, m ! Indices for the program. m for particles,
       ! i, j, k for coordinates
       LOGICAL nAccepted
       
       ! Parameters setup
-      ! For density rho = 0.40, L = (Np/0.40)^(1/3). With Np=343, L ~ 9.4996d0
-      PARAMETER (L=9.4996d0, Np=343, STEPS=50000, deltamax=0.2d0)
-      PARAMETER (pi=4*datan(1.d0), rbin=0.1d0)
+      PARAMETER (Np=343, STEPS=50000, deltamax=0.2d0)
+      PARAMETER (pi=4*datan(1.d0), rbin=0.02d0)
       PARAMETER (Nbins=int(4.1d0/rbin))
+      PARAMETER (T_target=1.25d0, rho_target=0.75d0)
       
       ! Arrays
       REAL*8 r(Np, 3), rnew(3), bins(0:Nbins-1) ! Positions of every part.,
       ! new generated move for one and bins to store g(r)
       
       ! In Lennard-Jones reduced units (sigma=1), density is just N/V
-      rho = dble(Np) / (L**3)
+      L = (dble(Np) / rho_target)**(1.d0/3.d0)
+      rho = rho_target
       print *, "Reduced Density (rho*): ", rho
+      print *, "Temperature (T*): ", T_target
+      print *, "Box length (L): ", L
       
 
       ! ============================================
@@ -77,7 +80,7 @@
           end do
           
           ! Subroutine to calculate energy change and accept/reject move
-          call ENERGY(Np, m, r, rnew, L, nAccepted)
+          call ENERGY(Np, m, r, rnew, L, T_target, nAccepted)
           if (nAccepted) then
             r(m,1:3) = rnew(1:3)
             Nmov = Nmov + 1
@@ -130,11 +133,11 @@
       END PROGRAM
 
       ! Subroutine: Calculate energy change and apply Metropolis criterion
-      SUBROUTINE ENERGY(Np, m, r, rnew, L, nAccepted)
+      SUBROUTINE ENERGY(Np, m, r, rnew, L, T_target, nAccepted)
       IMPLICIT NONE
       INTEGER m, Np, i
-      REAL*8 r(Np, 3), rnew(3), L, dist, newE, oldE, POTENTIAL,
-     +      RAN, beta
+      REAL*8 r(Np, 3), rnew(3), L, T_target, dist, newE, oldE
+      REAL*8 POTENTIAL, RAN, beta
       LOGICAL nAccepted
 
       ! We start by saying we accept it
@@ -142,8 +145,8 @@
       newE = 0.d0
       oldE = 0.d0
       
-      ! We are at T=1.25, so beta=1/T
-      beta = 1.d0 / 1.25d0
+      ! We use the parameter T_target
+      beta = 1.d0 / T_target
       
       do i=1, Np ! We check against every other particle
         if (i .ne. m) then ! except ourselves
@@ -158,7 +161,7 @@
       end do
 
       ! We accept the move if the energy is lower, or with a Boltzmann
-      ! probability if it is higher. We are at T=1.25, so kT=1.25.
+      ! probability if it is higher.
       if (newE .gt. oldE) then
         CALL RANDOM_NUMBER(RAN)
         if (EXP(-beta*(newE-oldE)) .lt. RAN) then
