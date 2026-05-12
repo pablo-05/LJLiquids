@@ -1,12 +1,12 @@
 LENNARD JONES CUT AND SHIFTED POTENTIAL
-1 - rho = 0.05, T = 0.90: Stable gas
-2 - rho = 0.80, T = 0.90: Stable liquid
-3 - rho = 0.05, T = 1.25: -
-4 - rho = 0.34, T = 1.10: Near critical point
-5 - rho = 0.40, T = 1.25: Supercritical fluid
+1 - rho = 0.05, T = 0.95: Gas.
+2 - rho = 0.05, T = 1.25: Fluido Supercrítico
+3 - rho = 0.50, T = 1.25: Fluido Supercrítico
+4 - rho = 0.75, T = 0.95: Líquido
+5 - rho = 0.75, T = 1.25: Fluido Supercrítico
 LENNARD JONES FULL POTENTIAL
-1 - rho = 0.0625, T = 0.95: Stable gas
-2 - rho = 0.0625, T = 1.15: Stable gas
-3 - rho = 0.50, T = 1.15: Phase coexistence
-4 - rho = 0.75, T = 0.95: Stable liquid
-5 - rho = 0.75, T = 1.15: Stable liquid
+1 - rho = 0.05, T = 0.95:  Mezcla Gas-Líquido. Mayoritariamente Gas.
+2 - rho = 0.05, T = 1.25: Gas
+3 - rho = 0.50, T = 1.25: Mezcla Gas-Líquido. Mayoritariamente Líquido.
+4 - rho = 0.75, T = 0.95: Líquido
+5 - rho = 0.75, T = 1.25: Líquido
