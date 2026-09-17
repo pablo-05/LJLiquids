@@ -164,15 +164,3 @@ particles per state point) are correct and runnable but are computationally heav
 directly from the existing `data/*.dat` files and cross-checked by eye against the original
 `graphs/*.png` renders, which they match.
 
-## Honesty / Caveats
-
-- The Monte Carlo runs themselves were **not re-executed** for this documentation pass (only
-  compiled and, for the theory solver, actually re-run and diffed against checked-in output) — the
-  `results/` plots are built from the pre-existing `data/*.dat` files, not from fresh simulation
-  output.
-- The `data/description.txt` vs `graphs/description.txt` conflict is resolved with high confidence
-  (three independent lines of evidence agree), but this project cannot claim access to the original
-  author's lab notebook — the resolution here is inferred from the artifacts in the repository.
-- Statistical noise in the Monte Carlo curves (visible as point-to-point scatter in the plots) is
-  expected and is not a bug; it reflects finite sampling (a fixed number of MC steps), not a flaw in
-  the method.
